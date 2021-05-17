@@ -38,7 +38,8 @@ function rad_reset(pos_id){
     }
 }
 
-function pos_object(pos_vec){
+function pos_object(pos_vec,
+                    x_3d_coord=random(object_x_params.start, object_x_params.end)){
     /*
     Makes JSON out of pos vector
     screen_pos: 2d y,z which can be directly translated into pixels. x is irrelevant.
@@ -56,7 +57,7 @@ function pos_object(pos_vec){
     radius_alter(pos_vec_json)
     dim_shift(pos_vec_json,
         type = 'to_3d',
-        x_3d_coord=random(object_x_params.start, object_x_params.end),
+        x_3d_coord=x_3d_coord,
         initialize=true)
     return pos_vec_json
 }
@@ -120,9 +121,8 @@ function initialize_objects(){
 }
 
 
-function re_initialize(pos_id, z_offset=z_stars){
-    [x,y,z=math.randomInt(z_offset,z_offset*2)] = spawn_by_shape()
-    pos_list[pos_id] = pos_object(createVector(x,y,z))
+function re_initialize(pos_id){
+    pos_list[pos_id] = pos_object(spawn_by_shape())
 }
 
 function setup(){
