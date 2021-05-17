@@ -71,12 +71,12 @@ function spawn_by_shape(){
     let circ_calc = function(){return math.sqrt(math.square(h/w)*(math.square(w)-math.square(x_val-x)))}
     let [x_abs,x,y,w,h] = [math.randomInt(width),...center,window_params.w, window_params.h]
     if ((x-w/2)<=x_abs && x_abs<=(x+w/2)) {
-        if (space_ship_shape === 'ellipse') {
+        if (window_params.shape === 'ellipse') {
             y_lim = circ_calc()
-        } else if (space_ship_shape === 'circle') {
+        } else if (window_params.shape === 'circle') {
             h = w
             y_lim = circ_calc()
-        } else if (space_ship_shape === 'rect') {
+        } else if (window_params.shape === 'rect') {
             y_lim = h/2
         }
         y_abs = [math.randomInt(y - y_lim), math.randomInt(y + y_lim, height)][math.randomInt(2)]
