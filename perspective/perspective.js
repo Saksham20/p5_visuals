@@ -6,8 +6,8 @@ Only during actual draw command, this is is transformed back using `transform_ax
  */
 
 const dt=1
-const my_vel = [0,0,-100]
 var pos_list, center
+const radius_limit = 50
 const num_stars = 1000
 const object_x_params = {'start': 100, 'end': 3000} //where the objects spawn wrt the window
 var window_params
@@ -28,12 +28,13 @@ function create_window_params(w,h,offset,shape){
             }
 }
 
-function rad_check(pos_id){//TODO: verify
-    x = [pos_list[pos_id].x[0],pos_list[pos_id].x[1]]
-    if (my_vel[2]<0){
-        return (x[0]<0) || (x[0]>width) || (x[1]<0) || (x[1]>height) || (pos_list[pos_id].r>radius_fixed)
-    } else{
-        return math.norm(x)<50
+function rad_reset(pos_id){
+    screen_pos = transform_axes(pos_list[pos_id].screen_pos, type='from')
+    if (camera_params.vel<0){
+        return (screen_pos.x<0) || (screen_pos.x>width) ||
+            (screen_pos.y<0) || (screen_pos.y>height) || (pos_list[pos_id].screen_rad>radius_limit)
+    } else {
+        return pos_list[pos_id].screen_rad<10
     }
 }
 
@@ -110,7 +111,7 @@ function initialize_objects(){
      */
     for (let i=0;i<num_stars;i++){
         random_vec = createVector(
-            math.randomInt(width), math.randomInt(height), 0)//TODO check offset
+            math.randomInt(width), math.randomInt(height), 0)
         pos_vec = transform_axes(random_vec, type='to')
         let pos_now = pos_object(pos_vec)
         pos_list.push(pos_now)
@@ -139,7 +140,7 @@ function draw(){
     for (let no=0;no<pos_list.length;no++){
         travel(pos_list[no])
         draw_now(pos_list[no],pos_list[no].r)
-        if (rad_check(no)){
+        if (rad_reset(no)){
             re_initialize(no)
         }
     }
