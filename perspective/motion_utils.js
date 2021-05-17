@@ -65,8 +65,8 @@ function radius_alter(pos_json){
 
 function spawn_by_shape(){
     /*
-    Returns a random location (2d) of type p5.Vector of the
-    new star based on the how the spaceship window looks!
+    Returns a new set of 2d screen coordinates for the object
+    based on the how the spaceship window looks!
      */
     let circ_calc = function(){return math.sqrt(math.square(h/w)*(math.square(w)-math.square(x_val-x)))}
     let [x_abs,x,y,w,h] = [math.randomInt(width),...center,window_params.w, window_params.h]
@@ -83,7 +83,5 @@ function spawn_by_shape(){
     } else {
         y_abs = math.randomInt(height)
     }
-    let [y_rel, z_rel] = [x_abs-center[0], y_abs-center[1]]
-    // TODO: extend vector till the x offset plane to get new y,z values.
-    return [x_val, y_val]
+    return transform_axes(createVector(x_abs,y_abs,0),type='to')
 }
