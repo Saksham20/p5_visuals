@@ -9,16 +9,17 @@ const dt=1
 const my_vel = [0,0,-100]
 var pos_list, center
 const num_stars = 1000
-const  spawn_plane_offset = 50
-const z_stars = my_vel[2]<0 ? 3000 : 50
-const radius_fixed = 20
+const object_x_params = {'start': 100, 'end': 3000} //where the objects spawn wrt the window
 var window_params
 var camera_params = {'pos_sph':createVector(0, 90, 0), 'vel': 0}
 const controller_params = {'rotate_scale': 5, 'vel_scale': 10} // degrees per key press
 
 function create_window_params(w,h,offset,shape){
     /*
-    All w,h,offset values are wrt inbuilt reference frame
+    w: width of the window
+    h: height of window
+    offset: values in pixels the observer is 'outside' the screen
+    shape: 'ellipse', 'rect', 'circle'
      */
     return {'w': w,
             'h': h,
@@ -46,12 +47,16 @@ function pos_object(pos_vec){
      */
     let pos_vec_json = {
         'screen_pos':pos_vec,
-        'relative_pos': pos_vec,//TODO: change via dim_shift
+        'relative_pos': pos_vec,
         'screen_rad':radius,
-        'fixed_pos':pos_vec, //TODO
+        'fixed_pos':pos_vec,
         'fixed_rad': random(20,40)
     }
     radius_alter(pos_vec_json)
+    dim_shift(pos_vec_json,
+        type = 'to_3d',
+        x_3d_coord=random(object_x_params.start, object_x_params.end),
+        initialize=true)
     return pos_vec_json
 }
 
@@ -126,7 +131,6 @@ function setup(){
     center = [width/2,height/2,0]
     background(0)
     initialize_objects()
-
 }
 
 function draw(){

@@ -8,16 +8,41 @@ function travel(pos){
     pos.r = radius_alter(pos.x);
 }
 
-function dim_shift(pos_json, type='to_3d'){
+function dim_shift(pos_json,
+                   type='to_3d',
+                   x_3d_coord = pos_json.relative_pos.x,
+                   initialize=false){
     /*
-    to_3d: goes from 2d screen coords to universe coords taking into
-        account the window params
-    from_3d: reverse op
+    to_3d(to get pos_json.relative_pos): goes from 2d screen coords to universe coords taking into
+        account the window params: finds the unit vector of the 3d vector
+        relative to the observer. Finds the scaling factor 'k' such that
+        when this unit vector is multiplied by this, it will reach the point
+        of the desired x value. The new y,z positions are the old ones scaled
+        by this factor and z is the desired z.
+    from_3d(to get pos_json.screen_pos): reverse logic.
+    x_random: value of x wrt the window, useful only from 2d to 3d conversion
      */
     if (type==='to_3d'){
-
+        observer_rel_2d = createVector(window_params.offset, pos_json.screen_pos.y, pos_json.screen_pos.z)
+        scale_factor = (x_3d_coord+window_params.offset)/observer_rel_2d.normalize().x
+        full_vec = createVector(
+            x_3d_coord,
+            scale_factor*pos_json.screen_pos.y,
+            scale_factor*pos_json.screen_pos.z)
+        pos_json.relative_pos = full_vec
+        if (initialize){
+            pos_json.fixed_pos = full_vec
+        }
     } else if (type==='from_3d'){
-
+        observer_rel_3d = createVector(
+            pos_json.relative_pos.x + window_params.offset,
+            pos_json.relative_pos.y,
+            pos_json.relative_pos.z)
+        scale_factor = window_params.offset/observer_rel_3d.normalize().x
+        pos_json.screen_pos = createVector(
+            0,
+            scale_factor*pos_json.screen_pos.y,
+            scale_factor*pos_json.screen_pos.z)
     }
 }
 
@@ -30,9 +55,8 @@ function get_relative_to_camera(pos_vec){
 
 function radius_alter(pos_json){
     /*
-    Using similar triangles, finds the radius value at a given distance
-    from a set spawn (center,spawn_plane_offset) where a radius value is
-    given at random.
+    Using similar triangles, finds the radius value at the current
+    position wrt the original spawn position
      */
     pos_json.relative_pos = get_relative_to_camera(pos_json.screen_pos)
     pos_json.screen_rad = (pos_json.fixed_pos.mag()*pos_json.fixed_rad)/pos_json.relative_pos.mag();
