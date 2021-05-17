@@ -11,7 +11,7 @@ const radius_limit = 50
 const num_stars = 1000
 const object_x_params = {'start': 100, 'end': 3000} //where the objects spawn wrt the window
 var window_params
-var camera_params = {'pos_sph':createVector(0, 90, 0), 'vel': 0}
+var camera_params
 const controller_params = {'rotate_scale': 5, 'vel_scale': 10} // degrees per key press
 
 function create_window_params(w,h,offset,shape){
@@ -47,12 +47,13 @@ function pos_object(pos_vec,
     fixed_pos: the actual spawn 3d location, does not change!
     screen_rad: changes, fixed_rad: as spawned
      */
+    rad_random = random(20,40)
     let pos_vec_json = {
         'screen_pos':pos_vec,
         'relative_pos': pos_vec,
-        'screen_rad':radius,
+        'screen_rad':rad_random,
         'fixed_pos':pos_vec,
-        'fixed_rad': random(20,40)
+        'fixed_rad': rad_random
     }
     radius_alter(pos_vec_json)
     dim_shift(pos_vec_json,
@@ -127,6 +128,7 @@ function re_initialize(pos_id){
 
 function setup(){
     createCanvas(1500,1000)
+    camera_params = {'pos_sph':createVector(0, 90, 0), 'vel': 0}
     window_params = create_window_params(0.8*width,0.8*height,50,'ellipse')
     pos_list = []
     center = [width/2,height/2,0]
@@ -139,7 +141,7 @@ function draw(){
     camera_params.pos_sph.z += camera_params.vel*dt
     for (let no=0;no<pos_list.length;no++){
         travel(pos_list[no])
-        draw_now(pos_list[no],pos_list[no].r)
+        draw_now(pos_list[no],pos_list[no].screen_rad)
         if (rad_reset(no)){
             re_initialize(no)
         }
