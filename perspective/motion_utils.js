@@ -1,11 +1,13 @@
 
-function travel(pos){
-    let new_pos = get_relative_position(pos.fixed_pos)
-    //TODO: find and assign the perspective.
-    pos.x = math.chain(dt).multiply(my_vel).add(pos.x).done();
-    rel = math.subtract(pos.x,center);
-    pos.plane = math.chain([rel[0],rel[1]]).norm().divide(math.norm(rel)).multiply(rel).add(center).done();
-    pos.r = radius_alter(pos.x);
+function travel(pos_json){
+    /*
+    1. Update the relative position given the new camera position
+    2. Find the corresponding 2d position on screen
+    3. Alter the radius
+     */
+    pos_json.relative_pos = get_relative_to_camera(pos_json.relative_pos)
+    dim_shift(pos_json)
+    radius_alter(pos_json)
 }
 
 function dim_shift(pos_json,
@@ -48,7 +50,7 @@ function dim_shift(pos_json,
 
 function get_relative_to_camera(pos_vec){
     /*
-    This func finds the relative position vector of star wrt camera_polar
+    This func finds the relative position vector of star wrt current camera_polar
      */
     return pos_vec.sub(p5.Vector.fromAngles(camera_polar.x,camera_polar.y,camera_polar.z))
 }
@@ -58,7 +60,6 @@ function radius_alter(pos_json){
     Using similar triangles, finds the radius value at the current
     position wrt the original spawn position
      */
-    pos_json.relative_pos = get_relative_to_camera(pos_json.screen_pos)
     pos_json.screen_rad = (pos_json.fixed_pos.mag()*pos_json.fixed_rad)/pos_json.relative_pos.mag();
 }
 
