@@ -57,12 +57,18 @@ function pos_object(pos_vec){
 
 function transform_axes(pos_vec,type='to'){
     /*
+    This function transforms and translates to the new frame and set of
+    defined axes.
     pos_vec: p5.Vector type
-    to: new type
-    from: the inbuilt type
+    to: inbuilt > new type
+    from: new type > inbuilt
      */
-    if (type==='to'){return createVector(pos_vec.z,pos_vec.x,pos_vec.y)}
-    else if (type==='from'){return createVector(pos_vec.y,pos_vec.z,pos_vec.x)}
+    if (type==='to'){
+        rel_pos_vec = pos_vec.sub(...center)
+        return createVector(rel_pos_vec.z,rel_pos_vec.x,rel_pos_vec.y)}
+    else if (type==='from'){
+        transformed_vec = createVector(pos_vec.y,pos_vec.z,pos_vec.x)
+        return transformed_vec.add(...center)}
 }
 
 //controller input:
@@ -88,7 +94,7 @@ function draw_now(pos_json,w,h=w){
     pos: the position JSON
      */
     fill(255);
-    pos_abs = transform_axes(pos_json.screen_pos,'from').add(...center)
+    pos_abs = transform_axes(pos_json.screen_pos,'from')
     ellipse(pos_abs.x,pos_abs.y,w,h)
 }
 
@@ -99,8 +105,8 @@ function initialize_objects(){
      */
     for (let i=0;i<num_stars;i++){
         random_vec = createVector(
-            math.randomInt(width), math.randomInt(height), math.randomInt(z_stars,z_stars*2))//TODO check offset
-        pos_vec = transform_axes(random_vec, type='to').sub(...center)
+            math.randomInt(width), math.randomInt(height), 0)//TODO check offset
+        pos_vec = transform_axes(random_vec, type='to')
         let pos_now = pos_object(pos_vec)
         pos_list.push(pos_now)
         draw_now(pos_now, pos_now.rad)
@@ -117,7 +123,7 @@ function setup(){
     createCanvas(1500,1000)
     window_params = create_window_params(0.8*width,0.8*height,50,'ellipse')
     pos_list = []
-    center = [0,width/2,height/2]
+    center = [width/2,height/2,0]
     background(0)
     initialize_objects()
 
