@@ -5,7 +5,7 @@ function travel(pos_json){
     2. Find the corresponding 2d position on screen
     3. Alter the radius
      */
-    pos_json.relative_pos = get_relative_to_camera(pos_json.relative_pos)
+    pos_json.relative_pos = get_relative_to_camera(pos_json.fixed_pos)
     dim_shift(pos_json,type='from_3d')
     radius_alter(pos_json)
 }
@@ -33,7 +33,9 @@ function dim_shift(pos_json,
             scale_factor*observer_rel_2d_norm.z)
         pos_json.relative_pos = full_vec
         if (initialize){
-            pos_json.fixed_pos = full_vec
+            pos_json.relative_org = createVector(full_vec.x, full_vec.y, full_vec.z)
+            pos_json.fixed_pos = createVector(
+                full_vec.x+spherical_to_cart().x, full_vec.y, full_vec.z)
         }
     } else if (type==='from_3d'){
         observer_rel_3d_norm = createVector(
@@ -42,10 +44,14 @@ function dim_shift(pos_json,
             pos_json.relative_pos.z).normalize()
         scale_factor = window_params.offset/observer_rel_3d_norm.x
         console.log('scale factor', scale_factor)
-        pos_json.screen_pos = createVector(
-            0,
-            scale_factor*observer_rel_3d_norm.y,
-            scale_factor*observer_rel_3d_norm.z)
+        if (scale_factor<0){
+            pos_json.screen_pos = createVector(0,-width,-height)
+        } else {
+            pos_json.screen_pos = createVector(
+                0,
+                scale_factor*observer_rel_3d_norm.y,
+                scale_factor*observer_rel_3d_norm.z)
+        }
     }
 }
 
@@ -65,16 +71,19 @@ function transform_axes(pos_vec,type='to'){
         return transformed_vec.add(...center)}
 }
 
+function spherical_to_cart(){
+    cart_frame = p5.Vector.fromAngles(
+        camera_params.pos_sph.y,
+        camera_params.pos_sph.x,
+        camera_params.pos_sph.z)
+    return createVector(cart_frame.z,cart_frame.x,cart_frame.y)
+}
+
 function get_relative_to_camera(pos_vec){
     /*
     This func finds the relative position vector of star wrt current camera_polar
      */
-    deg_to_rad = PI/180
-    cart_frame = p5.Vector.fromAngles(
-        deg_to_rad*camera_params.pos_sph.y,
-        deg_to_rad*camera_params.pos_sph.x,
-        camera_params.pos_sph.z)
-    return pos_vec.sub(createVector(cart_frame.z,cart_frame.x,cart_frame.y))
+    return pos_vec.sub(spherical_to_cart())
 }
 
 function radius_alter(pos_json){
@@ -82,7 +91,7 @@ function radius_alter(pos_json){
     Using similar triangles, finds the radius value at the current
     position wrt the original spawn position
      */
-    pos_json.screen_rad = (pos_json.fixed_pos.mag()*pos_json.fixed_rad)/pos_json.relative_pos.mag();
+    pos_json.screen_rad = ((object_x_params.start/2)*pos_json.fixed_rad)/pos_json.relative_pos.mag();
 }
 
 function spawn_by_shape(){
@@ -101,7 +110,11 @@ function spawn_by_shape(){
         } else if (window_params.shape === 'rect') {
             y_lim = h/2
         }
-        y_abs = [math.randomInt(y - y_lim), math.randomInt(y + y_lim, height)][math.randomInt(2)]
+        if (camera_params.vel<=0) {
+            y_abs = [math.randomInt(y - y_lim), math.randomInt(y + y_lim, height)][math.randomInt(2)]
+        } else {
+            y_abs = [math.randomInt(y - y_lim, y+y_lim)]
+        }
     } else {
         y_abs = math.randomInt(height)
     }
