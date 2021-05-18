@@ -6,7 +6,7 @@ function travel(pos_json){
     3. Alter the radius
      */
     pos_json.relative_pos = get_relative_to_camera(pos_json.relative_pos)
-    dim_shift(pos_json)
+    dim_shift(pos_json,type='from_3d')
     radius_alter(pos_json)
 }
 
@@ -25,26 +25,27 @@ function dim_shift(pos_json,
     x_random: value of x wrt the window, useful only from 2d to 3d conversion
      */
     if (type==='to_3d'){
-        observer_rel_2d = createVector(window_params.offset, pos_json.screen_pos.y, pos_json.screen_pos.z)
-        scale_factor = (x_3d_coord+window_params.offset)/observer_rel_2d.normalize().x
+        observer_rel_2d_norm = createVector(window_params.offset, pos_json.screen_pos.y, pos_json.screen_pos.z).normalize()
+        scale_factor = (x_3d_coord+window_params.offset)/observer_rel_2d_norm.x
         full_vec = createVector(
             x_3d_coord,
-            scale_factor*pos_json.screen_pos.y,
-            scale_factor*pos_json.screen_pos.z)
+            scale_factor*observer_rel_2d_norm.y,
+            scale_factor*observer_rel_2d_norm.z)
         pos_json.relative_pos = full_vec
         if (initialize){
             pos_json.fixed_pos = full_vec
         }
     } else if (type==='from_3d'){
-        observer_rel_3d = createVector(
+        observer_rel_3d_norm = createVector(
             pos_json.relative_pos.x + window_params.offset,
             pos_json.relative_pos.y,
-            pos_json.relative_pos.z)
-        scale_factor = window_params.offset/observer_rel_3d.normalize().x
+            pos_json.relative_pos.z).normalize()
+        scale_factor = window_params.offset/observer_rel_3d_norm.x
+        console.log('scale factor', scale_factor)
         pos_json.screen_pos = createVector(
             0,
-            scale_factor*pos_json.screen_pos.y,
-            scale_factor*pos_json.screen_pos.z)
+            scale_factor*observer_rel_3d_norm.y,
+            scale_factor*observer_rel_3d_norm.z)
     }
 }
 
