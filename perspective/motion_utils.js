@@ -69,7 +69,12 @@ function get_relative_to_camera(pos_vec){
     /*
     This func finds the relative position vector of star wrt current camera_polar
      */
-    return pos_vec.sub(p5.Vector.fromAngles(camera_params.pos_sph.x,camera_params.pos_sph.y,camera_params.pos_sph.z))
+    deg_to_rad = PI/180
+    cart_frame = p5.Vector.fromAngles(
+        deg_to_rad*camera_params.pos_sph.y,
+        deg_to_rad*camera_params.pos_sph.x,
+        camera_params.pos_sph.z)
+    return pos_vec.sub(createVector(cart_frame.z,cart_frame.x,cart_frame.y))
 }
 
 function radius_alter(pos_json){
