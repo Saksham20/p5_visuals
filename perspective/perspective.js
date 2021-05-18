@@ -30,12 +30,10 @@ function create_window_params(w,h,offset,shape){
 
 function rad_reset(pos_id){
     screen_pos = transform_axes(pos_list[pos_id].screen_pos, type='from')
-    if (camera_params.vel<0){
-        return (screen_pos.x<0) || (screen_pos.x>width) ||
-            (screen_pos.y<0) || (screen_pos.y>height) || (pos_list[pos_id].screen_rad>radius_limit)
-    } else {
-        return pos_list[pos_id].screen_rad<10
-    }
+    return (screen_pos.x<0) || (screen_pos.x>width) ||
+        (screen_pos.y<0) || (screen_pos.y>height) ||
+        (pos_list[pos_id].screen_rad>radius_limit) ||
+        (pos_list[pos_id].screen_rad<2)
 }
 
 function pos_object(pos_vec,
@@ -63,22 +61,6 @@ function pos_object(pos_vec,
     return pos_vec_json
 }
 
-function transform_axes(pos_vec,type='to'){
-    /*
-    This function transforms and translates to the new frame and set of
-    defined axes.
-    pos_vec: p5.Vector type
-    to: inbuilt > new type
-    from: new type > inbuilt
-     */
-    if (type==='to'){
-        rel_pos_vec = pos_vec.sub(...center)
-        return createVector(rel_pos_vec.z,rel_pos_vec.x,rel_pos_vec.y)}
-    else if (type==='from'){
-        transformed_vec = createVector(pos_vec.y,pos_vec.z,pos_vec.x)
-        return transformed_vec.add(...center)}
-}
-
 //controller input:
 function keyPressed() {
   if (keyCode === LEFT_ARROW) {
@@ -93,6 +75,8 @@ function keyPressed() {
         camera_params.vel += controller_params.vel_scale
   } else if (key === 's'){
         camera_params.vel -= controller_params.vel_scale
+  } else if (key === 'r'){
+      camera_params = {'pos_sph':createVector(0, 90, 0), 'vel': 0}
   }
 }
 
@@ -121,7 +105,6 @@ function initialize_objects(){
     }
 }
 
-
 function re_initialize(pos_id){
     pos_list[pos_id] = pos_object(spawn_by_shape())
 }
@@ -144,6 +127,7 @@ function draw(){
         draw_now(pos_list[no],pos_list[no].screen_rad)
         if (rad_reset(no)){
             re_initialize(no)
+            console.log('reinitializing---------------------------------------')
         }
     }
 }

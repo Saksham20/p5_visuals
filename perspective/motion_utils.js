@@ -49,6 +49,22 @@ function dim_shift(pos_json,
     }
 }
 
+function transform_axes(pos_vec,type='to'){
+    /*
+    This function transforms and translates to the new frame and set of
+    defined axes.
+    pos_vec: p5.Vector type
+    to: inbuilt > new type
+    from: new type > inbuilt
+     */
+    if (type==='to'){
+        rel_pos_vec = pos_vec.sub(...center)
+        return createVector(rel_pos_vec.z,rel_pos_vec.x,rel_pos_vec.y)}
+    else if (type==='from'){
+        transformed_vec = createVector(pos_vec.y,pos_vec.z,pos_vec.x)
+        return transformed_vec.add(...center)}
+}
+
 function get_relative_to_camera(pos_vec){
     /*
     This func finds the relative position vector of star wrt current camera_polar
@@ -69,7 +85,7 @@ function spawn_by_shape(){
     Returns a new set of 2d screen coordinates for the object
     based on the how the spaceship window looks!
      */
-    let circ_calc = function(){return math.sqrt(math.square(h/w)*(math.square(w)-math.square(x_val-x)))}
+    let circ_calc = function(){return math.sqrt(math.square(h/w)*(math.square(w)-math.square(x_abs-x)))}
     let [x_abs,x,y,w,h] = [math.randomInt(width),...center,window_params.w, window_params.h]
     if ((x-w/2)<=x_abs && x_abs<=(x+w/2)) {
         if (window_params.shape === 'ellipse') {
