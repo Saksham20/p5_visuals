@@ -69,7 +69,10 @@ function pos_object(pos_vec, x_3d_coord = null) {
 
 //controller input:
 function keyPressed() {
-    console.log(keyCode)
+    /*
+    assumed system: spherical: [theta(x,y), phi(wrt pole), rho]
+     */
+    console.log('keypressed',keyCode)
     if (keyCode === LEFT_ARROW) {
         camera_params.pos_sph.x -= controller_params.rotate_scale
     } else if (keyCode === RIGHT_ARROW) {
@@ -83,7 +86,7 @@ function keyPressed() {
     } else if (key === 's') {
         camera_params.vel -= controller_params.vel_scale
     } else if (key === 'r') {
-        camera_params = {'pos_sph': createVector(0, 90, 0), 'vel': 0}
+        camera_params = {'pos_sph': createVector(0, 90, 1), 'vel': 0}
     }
 }
 
@@ -118,7 +121,7 @@ function re_initialize(pos_id) {
 
 function setup() {
     createCanvas(1300, 700)
-    camera_params = {'pos_sph': createVector(0, 90, 0), 'vel': 0}
+    camera_params = {'pos_sph': createVector(0, 90, 1), 'vel': 0}
     window_params = create_window_params(0.8 * width, 0.8 * height, 50, 'ellipse')
     pos_list = []
     center = [width / 2, height / 2, 0]
@@ -131,6 +134,7 @@ function setup() {
 function draw() {
     background(0);
     camera_params.pos_sph.z += camera_params.vel * dt
+    console.log(camera_params.pos_sph)
     for (let no = 0; no < pos_list.length; no++) {
         travel(pos_list[no])
         draw_now(pos_list[no], pos_list[no].screen_rad)
